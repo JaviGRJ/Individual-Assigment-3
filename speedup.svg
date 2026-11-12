@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760">
+<style>text{font-family:Arial,sans-serif;font-size:12px;fill:#17202a}.title{font-size:22px;font-weight:bold}.axis{stroke:#17202a;stroke-width:2}.grid{stroke:#d9e0e6;stroke-width:1}.bar{fill:#357edd}</style>
+<text x="700.0" y="35" text-anchor="middle" class="title">Assignment 3 speedup</text>
+<line x1="95" y1="70" x2="95" y2="530" class="axis"/>
+<line x1="95" y1="530" x2="1360" y2="530" class="axis"/>
+<text x="22" y="300.0" transform="rotate(-90 22 300.0)" text-anchor="middle">Speedup relative to sequential</text>
+<text x="727.5" y="742" text-anchor="middle">Configuration</text>
+<line x1="95" y1="530.00" x2="1360" y2="530.00" class="grid"/>
+<text x="85" y="534.00" text-anchor="end">0.00</text>
+<line x1="95" y1="438.00" x2="1360" y2="438.00" class="grid"/>
+<text x="85" y="442.00" text-anchor="end">0.20</text>
+<line x1="95" y1="346.00" x2="1360" y2="346.00" class="grid"/>
+<text x="85" y="350.00" text-anchor="end">0.40</text>
+<line x1="95" y1="254.00" x2="1360" y2="254.00" class="grid"/>
+<text x="85" y="258.00" text-anchor="end">0.60</text>
+<line x1="95" y1="162.00" x2="1360" y2="162.00" class="grid"/>
+<text x="85" y="166.00" text-anchor="end">0.80</text>
+<line x1="95" y1="70.00" x2="1360" y2="70.00" class="grid"/>
+<text x="85" y="74.00" text-anchor="end">1.00</text>
+<rect x="126.62" y="70.00" width="147.58" height="460.00" class="bar"><title>sequential n=16 t=1: 1.000000</title></rect>
+<text x="200.42" y="548" transform="rotate(65 200.42 548)" text-anchor="start">sequential n=16 t=1</text>
+<rect x="337.46" y="274.42" width="147.58" height="255.58" class="bar"><title>parallel n=16 t=1: 0.555598</title></rect>
+<text x="411.25" y="548" transform="rotate(65 411.25 548)" text-anchor="start">parallel n=16 t=1</text>
+<rect x="548.29" y="298.37" width="147.58" height="231.63" class="bar"><title>parallel n=16 t=2: 0.503538</title></rect>
+<text x="622.08" y="548" transform="rotate(65 622.08 548)" text-anchor="start">parallel n=16 t=2</text>
+<rect x="759.12" y="70.00" width="147.58" height="460.00" class="bar"><title>sequential n=32 t=1: 1.000000</title></rect>
+<text x="832.92" y="548" transform="rotate(65 832.92 548)" text-anchor="start">sequential n=32 t=1</text>
+<rect x="969.96" y="158.62" width="147.58" height="371.38" class="bar"><title>parallel n=32 t=1: 0.807348</title></rect>
+<text x="1043.75" y="548" transform="rotate(65 1043.75 548)" text-anchor="start">parallel n=32 t=1</text>
+<rect x="1180.79" y="159.59" width="147.58" height="370.41" class="bar"><title>parallel n=32 t=2: 0.805233</title></rect>
+<text x="1254.58" y="548" transform="rotate(65 1254.58 548)" text-anchor="start">parallel n=32 t=2</text>
+</svg>
