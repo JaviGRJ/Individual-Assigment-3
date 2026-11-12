@@ -6,204 +6,55 @@ import csv
 import html
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parent
 
 
-def read_summary() -> list[dict[str, str]]:
-    """Read summary.csv."""
-    path = ROOT / "summary.csv"
-
-    if not path.is_file():
-        raise FileNotFoundError(
-            "summary.csv not found. Run benchmark_assignment3.py first."
-        )
-
-    with path.open(
-        newline="",
-        encoding="utf-8",
-    ) as source:
+def read_rows() -> list[dict[str, str]]:
+    with (ROOT / "summary.csv").open(newline="", encoding="utf-8") as source:
         return list(csv.DictReader(source))
 
 
-def create_chart(
-    rows: list[dict[str, str]],
-    value_key: str,
-    title: str,
-    y_label: str,
-    output_path: Path,
-) -> None:
-    """Create one labelled SVG bar chart."""
-    width = 1400
-    height = 760
-
-    left = 95
-    right = 40
-    top = 70
-    bottom = 230
-
-    plot_width = width - left - right
-    plot_height = height - top - bottom
-
-    usable_rows = [
-        row
-        for row in rows
-        if row.get(value_key, "") not in {"", None}
-    ]
-
-    if not usable_rows:
-        raise ValueError(
-            f"No values available for column {value_key}"
-        )
-
-    values = [
-        float(row[value_key])
-        for row in usable_rows
-    ]
-
-    maximum = max(values)
-
-    if maximum <= 0.0:
-        maximum = 1.0
-
-    bar_width = plot_width / len(usable_rows)
-
+def chart(rows: list[dict[str, str]], key: str, title: str, ylabel: str, path: Path) -> None:
+    width, height = 1200, 680
+    left, top, right, bottom = 85, 65, 30, 190
+    plot_w, plot_h = width - left - right, height - top - bottom
+    values = [float(row[key]) for row in rows if row[key]]
+    maximum = max(values) if values else 1.0
+    bar_w = plot_w / max(len(values), 1)
     lines = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        (
-            f'<svg xmlns="http://www.w3.org/2000/svg" '
-            f'width="{width}" height="{height}" '
-            f'viewBox="0 0 {width} {height}">'
-        ),
-        (
-            "<style>"
-            "text{font-family:Arial,sans-serif;font-size:12px;fill:#17202a}"
-            ".title{font-size:22px;font-weight:bold}"
-            ".axis{stroke:#17202a;stroke-width:2}"
-            ".grid{stroke:#d9e0e6;stroke-width:1}"
-            ".bar{fill:#357edd}"
-            "</style>"
-        ),
-        (
-            f'<text x="{width / 2}" y="35" '
-            f'text-anchor="middle" class="title">'
-            f"{html.escape(title)}</text>"
-        ),
-        (
-            f'<line x1="{left}" y1="{top}" '
-            f'x2="{left}" y2="{top + plot_height}" '
-            "class=\"axis\"/>"
-        ),
-        (
-            f'<line x1="{left}" y1="{top + plot_height}" '
-            f'x2="{left + plot_width}" '
-            f'y2="{top + plot_height}" class="axis"/>'
-        ),
-        (
-            f'<text x="22" y="{top + plot_height / 2}" '
-            f'transform="rotate(-90 22 {top + plot_height / 2})" '
-            f'text-anchor="middle">{html.escape(y_label)}</text>'
-        ),
-        (
-            f'<text x="{left + plot_width / 2}" '
-            f'y="{height - 18}" text-anchor="middle">'
-            "Configuration</text>"
-        ),
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">',
+        '<style>text{font-family:Arial;font-size:12px;fill:#17202a}.title{font-size:21px;font-weight:bold}.axis{stroke:#17202a;stroke-width:2}.grid{stroke:#d9e0e6}.bar{fill:#357edd}</style>',
+        f'<text x="{width/2}" y="32" text-anchor="middle" class="title">{html.escape(title)}</text>',
+        f'<line x1="{left}" y1="{top}" x2="{left}" y2="{top+plot_h}" class="axis"/>',
+        f'<line x1="{left}" y1="{top+plot_h}" x2="{left+plot_w}" y2="{top+plot_h}" class="axis"/>',
+        f'<text x="20" y="{top+plot_h/2}" transform="rotate(-90 20 {top+plot_h/2})" text-anchor="middle">{html.escape(ylabel)}</text>',
     ]
-
-    for grid_index in range(6):
-        fraction = grid_index / 5
-        y = top + plot_height - fraction * plot_height
-        label_value = maximum * fraction
-
-        lines.append(
-            f'<line x1="{left}" y1="{y:.2f}" '
-            f'x2="{left + plot_width}" y2="{y:.2f}" '
-            'class="grid"/>'
-        )
-
-        lines.append(
-            f'<text x="{left - 10}" y="{y + 4:.2f}" '
-            f'text-anchor="end">{label_value:.2f}</text>'
-        )
-
-    for index, row in enumerate(usable_rows):
-        value = float(row[value_key])
-
-        x = (
-            left
-            + index * bar_width
-            + bar_width * 0.15
-        )
-
-        bar_height = value / maximum * plot_height
-        y = top + plot_height - bar_height
-        actual_width = bar_width * 0.7
-
-        label = (
-            f'{row.get("method", "")} '
-            f'n={row.get("size", "")} '
-            f't={row.get("threads", "")}'
-        )
-
-        escaped_label = html.escape(label)
-
-        lines.append(
-            f'<rect x="{x:.2f}" y="{y:.2f}" '
-            f'width="{actual_width:.2f}" '
-            f'height="{bar_height:.2f}" '
-            'class="bar">'
-            f'<title>{escaped_label}: {value:.6f}</title>'
-            '</rect>'
-        )
-
-        label_x = x + actual_width / 2
-        label_y = top + plot_height + 18
-
-        lines.append(
-            f'<text x="{label_x:.2f}" y="{label_y}" '
-            f'transform="rotate(65 {label_x:.2f} {label_y})" '
-            f'text-anchor="start">{escaped_label}</text>'
-        )
-
-    lines.append("</svg>")
-
-    output_path.write_text(
-        "\n".join(lines),
-        encoding="utf-8",
-    )
+    for i in range(6):
+        fraction = i / 5
+        y = top + plot_h - fraction * plot_h
+        lines.append(f'<line x1="{left}" y1="{y:.2f}" x2="{left+plot_w}" y2="{y:.2f}" class="grid"/>')
+        lines.append(f'<text x="{left-8}" y="{y+4:.2f}" text-anchor="end">{maximum*fraction:.2f}</text>')
+    for i, row in enumerate(rows):
+        value = float(row[key])
+        x = left + i * bar_w + bar_w * 0.15
+        bar_height = value / maximum * plot_h
+        y = top + plot_h - bar_height
+        label = f'{row["method"]} n={row["size"]} t={row["threads"]}'
+        lines.append(f'<rect x="{x:.2f}" y="{y:.2f}" width="{bar_w*0.7:.2f}" height="{bar_height:.2f}" class="bar"><title>{html.escape(label)}: {value:.6f}</title></rect>')
+        lx, ly = x + bar_w * 0.35, top + plot_h + 18
+        lines.append(f'<text x="{lx:.2f}" y="{ly}" transform="rotate(62 {lx:.2f} {ly})">{html.escape(label)}</text>')
+    lines.extend([
+        f'<text x="{left+plot_w/2}" y="{height-18}" text-anchor="middle">Configuration</text>',
+        "</svg>",
+    ])
+    path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def main() -> None:
-    rows = read_summary()
-
-    create_chart(
-        rows,
-        value_key="median_ms",
-        title="Assignment 3 runtime",
-        y_label="Median time (ms)",
-        output_path=ROOT / "runtime.svg",
-    )
-
-    create_chart(
-        rows,
-        value_key="speedup",
-        title="Assignment 3 speedup",
-        y_label="Speedup relative to sequential",
-        output_path=ROOT / "speedup.svg",
-    )
-
-    create_chart(
-        rows,
-        value_key="peak_memory_mib",
-        title="Assignment 3 memory",
-        y_label="Peak traced memory (MiB)",
-        output_path=ROOT / "memory.svg",
-    )
-
-    print(
-        "Created runtime.svg, speedup.svg and memory.svg."
-    )
+    rows = read_rows()
+    chart(rows, "median_ms", "Assignment 3 runtime", "Median time (ms)", ROOT / "runtime.svg")
+    chart(rows, "speedup", "Assignment 3 speedup", "Speedup relative to sequential", ROOT / "speedup.svg")
+    chart(rows, "peak_memory_mib", "Assignment 3 memory", "Peak traced memory (MiB)", ROOT / "memory.svg")
 
 
 if __name__ == "__main__":
