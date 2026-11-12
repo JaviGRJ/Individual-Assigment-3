@@ -1,0 +1,29 @@
+{
+  "assignment": 3,
+  "run_timestamp": "2026-11-12T21:24:58+00:00",
+  "python_version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+  "operating_system": "Windows-10-10.0.19045-SP0",
+  "seed": 20261112,
+  "sizes": [
+    16,
+    32
+  ],
+  "thread_counts": [
+    1,
+    2
+  ],
+  "repetitions": 5,
+  "warmups": 1,
+  "time_limit_seconds": 60.0,
+  "memory_limit_mib": 2048.0,
+  "memory_metric": "Python traced allocation peak via tracemalloc",
+  "timing_boundary": "multiplication call only; input generation, allocation and validation excluded",
+  "parallel_framework": "concurrent.futures.ThreadPoolExecutor",
+  "thread_safety": "each worker calculates a different complete output row",
+  "logical_processors": 16,
+  "physical_cores": 8,
+  "affinity": "OS scheduler default; no affinity pinning",
+  "internal_library_threads": 0,
+  "numeric_type": "Python float",
+  "vectorisation": "not undertaken"
+}
